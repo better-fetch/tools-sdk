@@ -59,6 +59,14 @@ export interface FetchPayload {
   screenshot?: boolean;
   full_page?: boolean;
   country?: string;
+  /**
+   * Residential proxy egress (billed per GB, so use sparingly):
+   *   "none"        (default) own datacenter egress, identity rotation only
+   *   "auto"        first attempt unproxied; block-retries escalate to proxy
+   *   "residential" every attempt through the residential proxy
+   * Prefer "auto" — it only spends bandwidth when the free path is blocked.
+   */
+  proxy?: "none" | "auto" | "residential";
   session?: string;
   geoip?: boolean;
   locale?: string;
