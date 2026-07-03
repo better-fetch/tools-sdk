@@ -27,6 +27,39 @@ export interface ToolExample {
   };
 }
 
+export interface ToolLogo {
+  /** Human label for the inline SVG mark, e.g. "Google logo". */
+  label: string;
+  /**
+   * Safe inline SVG. The site renders it as a grey CSS mask so the original
+   * colors are ignored but the brand/object silhouette remains recognizable.
+   */
+  svg: string;
+  /** Optional source or brand-guidelines URL for auditability. */
+  sourceUrl?: string;
+}
+
+export interface ToolSeoContent {
+  /** SEO title for the tool page; the site appends Better Fetch. */
+  title: string;
+  /** Search-result description for this specific tool page. */
+  description: string;
+  /** Intro copy rendered on the tool page. */
+  intro: string;
+  useCases: { title: string; description: string }[];
+  faqs: { question: string; answer: string }[];
+  keywords: string[];
+}
+
+export interface ToolPopularity {
+  /** Lower is more popular; Apify Store rank is the first benchmarking source. */
+  rank?: number;
+  score?: number;
+  source?: string;
+  sourceUrl?: string;
+  benchmarkedAgainst?: string;
+}
+
 export interface ToolManifest {
   /** Must equal the repo name with dashes as underscores. */
   name: string;
@@ -35,6 +68,9 @@ export interface ToolManifest {
   title: string;
   description: string;
   category: string;
+  logo: ToolLogo;
+  seo: ToolSeoContent;
+  popularity?: ToolPopularity;
   /** Typical engine calls per run — display only; metering is per call. */
   creditsEstimate: number;
   /** Hard cap on engine calls per run in the hosted runner (default 20, max 50). */

@@ -262,6 +262,32 @@ export declare const manifestSchema: z.ZodObject<{
     title: z.ZodString;
     description: z.ZodString;
     category: z.ZodString;
+    logo: z.ZodObject<{
+        label: z.ZodString;
+        svg: z.ZodString;
+        sourceUrl: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>;
+    seo: z.ZodObject<{
+        title: z.ZodString;
+        description: z.ZodString;
+        intro: z.ZodString;
+        useCases: z.ZodArray<z.ZodObject<{
+            title: z.ZodString;
+            description: z.ZodString;
+        }, z.core.$strip>>;
+        faqs: z.ZodArray<z.ZodObject<{
+            question: z.ZodString;
+            answer: z.ZodString;
+        }, z.core.$strip>>;
+        keywords: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>;
+    popularity: z.ZodOptional<z.ZodObject<{
+        rank: z.ZodOptional<z.ZodNumber>;
+        score: z.ZodOptional<z.ZodNumber>;
+        source: z.ZodOptional<z.ZodString>;
+        sourceUrl: z.ZodOptional<z.ZodString>;
+        benchmarkedAgainst: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>>;
     creditsEstimate: z.ZodNumber;
     maxEngineCalls: z.ZodOptional<z.ZodNumber>;
     inputSchema: z.ZodObject<{

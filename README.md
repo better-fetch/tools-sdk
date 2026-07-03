@@ -10,7 +10,7 @@ SDK and CLI for building [Better Fetch](https://betterfetch.co) tools — define
 
 A tool is a repo in the [better-fetch org](https://github.com/better-fetch) with:
 
-1. **`betterfetch.tool.json`** — the manifest: name, version, schemas, examples.
+1. **`betterfetch.tool.json`** — the manifest: name, version, category, grey-renderable SVG logo, SEO copy, schemas, examples, and optional popularity benchmark metadata.
 2. **An entry module** that default-exports the handler:
 
 ```ts
@@ -35,7 +35,8 @@ bundles in an isolate where none of those exist).
 Input/output schemas use a constrained JSON-Schema subset (flat objects of
 scalars, arrays of scalars, one level of nesting — see `src/manifest.ts`).
 The subset is what lets one manifest drive MCP registration, the playground
-form, and docs.
+form, and docs. The same manifest also drives category navigation, the footer,
+tool pages, per-tool `llms.txt`, sitemap entries, and MCP descriptions.
 
 ## Run a tool locally
 

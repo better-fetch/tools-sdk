@@ -4,7 +4,10 @@ export type {
   FetchResult,
   JsonSchemaObject,
   ToolExample,
+  ToolLogo,
   ToolManifest,
+  ToolPopularity,
+  ToolSeoContent,
   ToolRun,
 } from "./types.js";
 export { BfError, createBf, type CreateBfOptions } from "./bf.js";

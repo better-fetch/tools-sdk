@@ -83,12 +83,69 @@ export const outputIoSchema = z.object({
     required: z.array(z.string()).optional(),
     additionalProperties: z.literal(false),
 });
+function safeInlineSvg(svg) {
+    const trimmed = svg.trim();
+    if (!/^<svg[\s>]/i.test(trimmed) || !/<\/svg>$/i.test(trimmed))
+        return false;
+    if (/<\s*(script|foreignObject|iframe|object|embed|link|style)\b/i.test(trimmed))
+        return false;
+    if (/\son[a-z]+\s*=/i.test(trimmed))
+        return false;
+    if (/\b(?:href|xlink:href|src)\s*=/i.test(trimmed))
+        return false;
+    if (/url\(\s*['"]?(?!#)/i.test(trimmed))
+        return false;
+    return true;
+}
+const toolLogoSchema = z.object({
+    label: z.string().min(2).max(80),
+    svg: z
+        .string()
+        .min(20)
+        .max(20_000)
+        .refine(safeInlineSvg, "logo.svg must be a safe inline <svg> without scripts, event handlers, href/src, or external references"),
+    sourceUrl: z.string().url().optional(),
+});
+const seoSchema = z.object({
+    title: z.string().min(20).max(90),
+    description: z.string().min(80).max(320),
+    intro: z.string().min(160).max(1200),
+    useCases: z
+        .array(z.object({
+        title: z.string().min(3).max(80),
+        description: z.string().min(40).max(320),
+    }))
+        .min(2)
+        .max(6),
+    faqs: z
+        .array(z.object({
+        question: z.string().min(10).max(140),
+        answer: z.string().min(40).max(500),
+    }))
+        .min(2)
+        .max(6),
+    keywords: z.array(z.string().min(2).max(60)).min(3).max(16),
+});
+const popularitySchema = z
+    .object({
+    rank: z.number().int().min(1).max(10_000).optional(),
+    score: z.number().min(0).max(1_000_000_000).optional(),
+    source: z.string().min(2).max(80).optional(),
+    sourceUrl: z.string().url().optional(),
+    benchmarkedAgainst: z.string().min(2).max(120).optional(),
+})
+    .refine((value) => value.rank !== undefined || value.score !== undefined, {
+    message: "popularity must include rank or score",
+});
 export const manifestSchema = z.object({
     name: z.string().regex(/^[a-z][a-z0-9_]{2,63}$/),
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
     title: z.string().min(3).max(80),
     description: z.string().min(20).max(500),
     category: z.string().regex(/^[a-z][a-z0-9-]{1,31}$/),
+    logo: toolLogoSchema,
+    seo: seoSchema,
+    popularity: popularitySchema.optional(),
     creditsEstimate: z.number().int().min(1).max(50),
     maxEngineCalls: z.number().int().min(1).max(50).optional(),
     inputSchema: ioSchema,
