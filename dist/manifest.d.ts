@@ -284,9 +284,6 @@ export declare const manifestSchema: z.ZodObject<{
     popularity: z.ZodOptional<z.ZodObject<{
         rank: z.ZodOptional<z.ZodNumber>;
         score: z.ZodOptional<z.ZodNumber>;
-        source: z.ZodOptional<z.ZodString>;
-        sourceUrl: z.ZodOptional<z.ZodString>;
-        benchmarkedAgainst: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>>;
     creditsEstimate: z.ZodNumber;
     maxEngineCalls: z.ZodOptional<z.ZodNumber>;

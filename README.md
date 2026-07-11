@@ -1,17 +1,36 @@
-# @better-fetch/tools
+# `@better-fetch/tools`
 
-SDK and CLI for building [Better Fetch](https://betterfetch.co) tools — define a tool once and it runs in three places, always metered through a Better Fetch API key:
+SDK and CLI for building ready-made tools on the
+[Better Fetch](https://betterfetch.co) web-data engine.
 
-- **Locally** — clone any tool repo, `bf-tool run` with your own key
-- **On betterfetch.co** — the site playground on every tool page
-- **Over MCP** — every live tool is a tool on the `https://betterfetch.co/api/mcp` connector
+A tool is defined once and can run:
 
-## The contract
+- locally with the author's Better Fetch key;
+- on its page at `betterfetch.co/tools`;
+- over MCP through `search_tools` and `run_tool`;
+- through `POST /api/tools/{name}/run`.
 
-A tool is a repo in the [better-fetch org](https://github.com/better-fetch) with:
+The public catalogue is currently first-party. The SDK and template are public
+so the authoring contract can stabilize in the open before third-party
+publishing is enabled.
 
-1. **`betterfetch.tool.json`** — the manifest: name, version, category, grey-renderable SVG logo, SEO copy, schemas, examples, and optional popularity benchmark metadata.
-2. **An entry module** that default-exports the handler:
+## Install
+
+Until the package is published to npm, pin the current GitHub release:
+
+```bash
+npm install 'git+https://github.com/better-fetch/tools-sdk.git#v0.2.0'
+```
+
+Do not depend on the moving `main` branch in production tool repositories.
+
+## Tool contract
+
+Each tool contains:
+
+1. `betterfetch.tool.json` — identity, version, category, full-colour SVG logo,
+   SEO copy, credit estimate, schemas, and runnable examples.
+2. An entry module that default-exports a handler:
 
 ```ts
 import { defineTool } from "@better-fetch/tools";
@@ -24,41 +43,42 @@ export default defineTool<{ url: string }, { title: string }>(
 );
 ```
 
-`bf` is the only capability a handler gets — a thin client over the engine's
-`POST /v1/fetch` (`bf.fetch`, `bf.fetchText`, `bf.fetchJson`, `bf.screenshot`).
-Every call costs one credit on the caller's key, locally and hosted alike.
+`bf` is the handler's only I/O capability. It exposes metered calls to the
+Better Fetch engine (`fetch`, `fetchText`, `fetchJson`, and `screenshot`). Tool
+code has no ambient network, filesystem, process, or Node built-ins because the
+hosted runner executes bundles in an isolate.
 
-Tools must be **pure JS**: no node builtins, no ambient network, no
-filesystem. `bf-tool validate` enforces this (the hosted runner executes
-bundles in an isolate where none of those exist).
-
-Input/output schemas use a constrained JSON-Schema subset (flat objects of
-scalars, arrays of scalars, one level of nesting — see `src/manifest.ts`).
-The subset is what lets one manifest drive MCP registration, the playground
-form, and docs. The same manifest also drives category navigation, the footer,
-tool pages, per-tool `llms.txt`, sitemap entries, and MCP descriptions.
-
-## Run a tool locally
-
-```sh
-git clone https://github.com/better-fetch/extract-article
-cd extract-article && npm ci
-export BETTER_FETCH_API_KEY=bf_...   # https://betterfetch.co/keys
-npx bf-tool run --input '{"url": "https://example.com"}'
-```
+Input/output schemas use a constrained JSON-Schema subset so one manifest can
+drive MCP discovery, playground forms, examples, documentation, `llms.txt`, and
+validation. Start from the
+[`tool-template`](https://github.com/better-fetch/tool-template) rather than
+recreating the contract by hand.
 
 ## CLI
 
-| Command | What it does |
+| Command | Purpose |
 |---|---|
-| `bf-tool validate` | Manifest meta-schema + pure-JS bundle check (no network) |
-| `bf-tool bundle`   | Write the runner-ready IIFE bundle + sha256 |
-| `bf-tool run`      | Execute with `--input '{...}'` or `--example <name>` |
-| `bf-tool test`     | Run every manifest example, assert `expect.outputMatches` |
+| `bf-tool validate` | Validate the manifest, schema subset, bundle purity, and entry point without network calls. |
+| `bf-tool bundle` | Produce a runner-ready IIFE bundle and SHA-256 digest. |
+| `bf-tool run` | Run one input or named example with the caller's Better Fetch key. |
+| `bf-tool test` | Run every manifest example and assert its declared output match. |
 
-## Publishing
+```bash
+export BETTER_FETCH_API_KEY=bf_...
+npx bf-tool validate
+npx bf-tool test
+```
 
-Tools ship from CI: push to main in an org tool repo runs
-validate → bundle → test against the live engine → publish to the Better
-Fetch registry. Green CI on main **is** production. Start from
-[tool-template](https://github.com/better-fetch/tool-template).
+## Publishing model
+
+First-party tools live in
+[`better-fetch/tools`](https://github.com/better-fetch/tools). CI validates,
+bundles, runs examples against the production engine, and publishes to the
+registry only after the production checks pass.
+
+Third-party registry publishing is not open yet. Local tools can still use this
+SDK and the hosted engine today.
+
+## License
+
+MIT

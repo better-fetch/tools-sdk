@@ -141,9 +141,6 @@ const popularitySchema = z
   .object({
     rank: z.number().int().min(1).max(10_000).optional(),
     score: z.number().min(0).max(1_000_000_000).optional(),
-    source: z.string().min(2).max(80).optional(),
-    sourceUrl: z.string().url().optional(),
-    benchmarkedAgainst: z.string().min(2).max(120).optional(),
   })
   .refine((value) => value.rank !== undefined || value.score !== undefined, {
     message: "popularity must include rank or score",

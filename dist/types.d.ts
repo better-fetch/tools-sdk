@@ -47,12 +47,9 @@ export interface ToolSeoContent {
     keywords: string[];
 }
 export interface ToolPopularity {
-    /** Lower is more popular; Apify Store rank is the first benchmarking source. */
+    /** Lower is more popular inside the Better Fetch marketplace. */
     rank?: number;
     score?: number;
-    source?: string;
-    sourceUrl?: string;
-    benchmarkedAgainst?: string;
 }
 export interface ToolManifest {
     /** Must equal the repo name with dashes as underscores. */
