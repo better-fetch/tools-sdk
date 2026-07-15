@@ -1,4 +1,4 @@
-export type { Bf, FetchPayload, FetchResult, JsonSchemaObject, ToolExample, ToolLogo, ToolManifest, ToolPopularity, ToolSeoContent, ToolRun, } from "./types.js";
+export type { AgeGenderPayload, AgeGenderResult, Bf, FetchPayload, FetchResult, ScrapeImage, ScrapeLink, ScrapePayload, ScrapeResult, TranscriptSegment, TranscribePayload, TranscribeResult, TikTokShopShowcasePayload, TikTokShopShowcaseProduct, TikTokShopShowcaseResult, JsonSchemaObject, ToolExample, ToolLogo, ToolManifest, ToolPopularity, ToolSeoContent, ToolRun, } from "./types.js";
 export { BfError, createBf, type CreateBfOptions } from "./bf.js";
 export { checkOutputMatches, ioSchema, manifestSchema, outputIoSchema, validateManifest, } from "./manifest.js";
 import type { Bf, ToolRun } from "./types.js";

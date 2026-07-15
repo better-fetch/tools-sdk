@@ -1,4 +1,16 @@
-import type { Bf, FetchPayload, FetchResult } from "./types.js";
+import type {
+  AgeGenderPayload,
+  AgeGenderResult,
+  Bf,
+  FetchPayload,
+  FetchResult,
+  ScrapePayload,
+  ScrapeResult,
+  TranscribePayload,
+  TranscribeResult,
+  TikTokShopShowcasePayload,
+  TikTokShopShowcaseResult,
+} from "./types.js";
 
 export class BfError extends Error {
   code: string;
@@ -49,8 +61,118 @@ export function createBf(opts: CreateBfOptions): Bf {
     return body;
   }
 
+  async function doScrape(payload: ScrapePayload): Promise<ScrapeResult> {
+    const res = await fetch(`${baseUrl}/v1/scrape`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${opts.apiKey}`,
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    let body: ScrapeResult;
+    try {
+      body = (await res.json()) as ScrapeResult;
+    } catch {
+      throw new BfError("bad_response", `engine returned non-JSON (HTTP ${res.status})`, res.status);
+    }
+    if (body.ok === false) {
+      throw new BfError(body.error ?? "scrape_failed", body.message ?? "scrape failed", res.status);
+    }
+    return body;
+  }
+
+  async function doTranscribe(payload: TranscribePayload): Promise<TranscribeResult> {
+    const res = await fetch(`${baseUrl}/v1/transcribe`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${opts.apiKey}`,
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    let body: TranscribeResult;
+    try {
+      body = (await res.json()) as TranscribeResult;
+    } catch {
+      throw new BfError("bad_response", `engine returned non-JSON (HTTP ${res.status})`, res.status);
+    }
+    if (body.ok === false) {
+      throw new BfError(
+        body.error ?? "transcription_failed",
+        body.message ?? "transcription failed",
+        res.status,
+      );
+    }
+    return body;
+  }
+
+  async function doAgeGender(payload: AgeGenderPayload): Promise<AgeGenderResult> {
+    const res = await fetch(`${baseUrl}/v1/age-gender`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${opts.apiKey}`,
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    let body: AgeGenderResult;
+    try {
+      body = (await res.json()) as AgeGenderResult;
+    } catch {
+      throw new BfError("bad_response", `engine returned non-JSON (HTTP ${res.status})`, res.status);
+    }
+    if (body.ok === false) {
+      throw new BfError(body.error ?? "vision_failed", body.message ?? "vision failed", res.status);
+    }
+    return body;
+  }
+
+  async function doTikTokShopShowcase(
+    payload: TikTokShopShowcasePayload,
+  ): Promise<TikTokShopShowcaseResult> {
+    const res = await fetch(`${baseUrl}/v1/social/tiktok-shop/showcase`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${opts.apiKey}`,
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    let body: TikTokShopShowcaseResult;
+    try {
+      body = (await res.json()) as TikTokShopShowcaseResult;
+    } catch {
+      throw new BfError("bad_response", `engine returned non-JSON (HTTP ${res.status})`, res.status);
+    }
+    if (body.ok === false) {
+      throw new BfError(
+        body.error ?? "showcase_failed",
+        body.message ?? "TikTok Shop showcase retrieval failed",
+        res.status,
+      );
+    }
+    return body;
+  }
+
   return {
     fetch: doFetch,
+    scrape: doScrape,
+    transcribe: doTranscribe,
+    ageGender: doAgeGender,
+    tiktokShopShowcase: doTikTokShopShowcase,
+    async scrapeText(url, opts2) {
+      const document = await doScrape({ url, ...opts2 });
+      return { text: document.text ?? "", document };
+    },
+    async scrapeMarkdown(url, opts2) {
+      const document = await doScrape({ url, ...opts2 });
+      return { markdown: document.markdown ?? "", document };
+    },
     async fetchText(url, opts2) {
       const r = await doFetch({ url, return_response_text: true, ...opts2 });
       return {

@@ -19,7 +19,7 @@ publishing is enabled.
 Until the package is published to npm, pin the current GitHub release:
 
 ```bash
-npm install 'git+https://github.com/better-fetch/tools-sdk.git#v0.2.0'
+npm install 'git+https://github.com/better-fetch/tools-sdk.git#v0.5.0'
 ```
 
 Do not depend on the moving `main` branch in production tool repositories.
@@ -37,14 +37,21 @@ import { defineTool } from "@better-fetch/tools";
 
 export default defineTool<{ url: string }, { title: string }>(
   async (input, bf) => {
-    const page = await bf.fetchText(input.url);
+    const page = await bf.scrape({ url: input.url });
     return { title: page.title ?? "" };
   },
 );
 ```
 
 `bf` is the handler's only I/O capability. It exposes metered calls to the
-Better Fetch engine (`fetch`, `fetchText`, `fetchJson`, and `screenshot`). Tool
+Better Fetch engine (`fetch`, `fetchText`, `fetchJson`, `screenshot`, `scrape`,
+`scrapeText`, `scrapeMarkdown`, `transcribe`, `ageGender`, and
+`tiktokShopShowcase`). Use `fetch` for raw transport data,
+`scrape` or its text/Markdown helpers for a clean page document, `transcribe` for
+bounded public audio/video speech-to-text, and `ageGender` for the explicitly
+limited local appearance estimate from a face-focused public image. The
+`tiktokShopShowcase` capability uses Better Fetch's server-configured managed
+provider; provider credentials are never accepted from or exposed to tools. Tool
 code has no ambient network, filesystem, process, or Node built-ins because the
 hosted runner executes bundles in an isolate.
 

@@ -149,9 +149,152 @@ export interface FetchResult {
   message?: string;
 }
 
+/** POST /v1/scrape: retrieval fields plus deterministic document options. */
+export interface ScrapePayload extends FetchPayload {
+  only_main_content?: boolean;
+  max_chars?: number;
+  max_links?: number;
+  max_images?: number;
+  include_raw_html?: boolean;
+}
+
+export interface ScrapeLink {
+  url: string;
+  text: string;
+}
+
+export interface ScrapeImage {
+  url: string;
+  alt: string;
+}
+
+export interface ScrapeResult {
+  ok: boolean;
+  url?: string;
+  title?: string;
+  markdown?: string;
+  text?: string;
+  markdown_truncated?: boolean;
+  text_truncated?: boolean;
+  word_count?: number;
+  links?: ScrapeLink[];
+  images?: ScrapeImage[];
+  metadata?: Record<string, unknown>;
+  retrieval?: FetchResult;
+  html?: string;
+  error?: string;
+  message?: string;
+}
+
+/** POST /v1/transcribe: bounded public audio/video speech-to-text. */
+export interface TranscribePayload {
+  url: string;
+  /** Optional ISO-style language hint, e.g. "en". Omit for detection. */
+  language?: string;
+}
+
+export interface TranscriptSegment {
+  start: number;
+  end: number;
+  text: string;
+}
+
+export interface TranscribeResult {
+  ok: boolean;
+  source_url?: string;
+  content_type?: string;
+  text?: string;
+  language?: string;
+  language_probability?: number;
+  duration_seconds?: number;
+  segments?: TranscriptSegment[];
+  body_bytes?: number;
+  credits_used?: number;
+  remaining_credits?: number;
+  error?: string;
+  message?: string;
+}
+
+/** POST /v1/age-gender: local appearance estimate for one face-focused image. */
+export interface AgeGenderPayload {
+  url: string;
+}
+
+export interface AgeGenderResult {
+  ok: boolean;
+  source_url?: string;
+  content_type?: string;
+  age_range?: "0-2" | "4-6" | "8-12" | "15-20" | "25-32" | "38-43" | "48-53" | "60+";
+  age_midpoint?: number;
+  age_confidence?: number;
+  gender_presentation?: "male" | "female";
+  gender_confidence?: number;
+  image_width?: number;
+  image_height?: number;
+  model?: string;
+  limitations?: string;
+  body_bytes?: number;
+  credits_used?: number;
+  remaining_credits?: number;
+  error?: string;
+  message?: string;
+}
+
+/** POST /v1/social/tiktok-shop/showcase: configured managed-provider retrieval. */
+export interface TikTokShopShowcasePayload {
+  handle: string;
+  region?: "US" | "us";
+  cursor?: string;
+}
+
+export interface TikTokShopShowcaseProduct {
+  product_id: string;
+  title: string;
+  url: string;
+  image_url?: string;
+  price?: string;
+  original_price?: string;
+  currency?: string;
+  discount?: string;
+  rating?: number;
+  review_count?: number;
+  sold_count?: number;
+  seller_id?: string;
+  sku_id?: string;
+}
+
+export interface TikTokShopShowcaseResult {
+  ok: boolean;
+  handle?: string;
+  region?: "US";
+  source_url?: string;
+  source_type?: "managed_upstream";
+  count?: number;
+  products?: TikTokShopShowcaseProduct[];
+  has_more?: boolean;
+  cursor?: string;
+  body_bytes?: number;
+  credits_used?: number;
+  remaining_credits?: number;
+  error?: string;
+  message?: string;
+}
+
 /** The only capability a tool handler receives. */
 export interface Bf {
   fetch(payload: FetchPayload): Promise<FetchResult>;
+  scrape(payload: ScrapePayload): Promise<ScrapeResult>;
+  transcribe(payload: TranscribePayload): Promise<TranscribeResult>;
+  ageGender(payload: AgeGenderPayload): Promise<AgeGenderResult>;
+  tiktokShopShowcase(payload: TikTokShopShowcasePayload): Promise<TikTokShopShowcaseResult>;
+  scrapeText(
+    url: string,
+    opts?: Omit<ScrapePayload, "url">,
+  ): Promise<{ text: string; document: ScrapeResult }>;
+  scrapeMarkdown(
+    url: string,
+    opts?: Omit<ScrapePayload, "url">,
+  ): Promise<{ markdown: string; document: ScrapeResult }>;
   fetchText(
     url: string,
     opts?: Omit<FetchPayload, "url">,

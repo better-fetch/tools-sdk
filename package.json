@@ -1,6 +1,6 @@
 {
   "name": "@better-fetch/tools",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "description": "SDK and CLI for building Better Fetch tools — define a tool once, run it locally, on betterfetch.co, and over MCP.",
   "license": "MIT",
   "repository": {
