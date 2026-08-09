@@ -156,6 +156,7 @@ export const manifestSchema = z.object({
   seo: seoSchema,
   popularity: popularitySchema.optional(),
   creditsEstimate: z.number().int().min(1).max(50),
+  requiresResidential: z.boolean().optional().default(false),
   maxEngineCalls: z.number().int().min(1).max(50).optional(),
   inputSchema: ioSchema,
   outputSchema: outputIoSchema.optional(),

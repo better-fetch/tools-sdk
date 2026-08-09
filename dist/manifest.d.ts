@@ -286,6 +286,7 @@ export declare const manifestSchema: z.ZodObject<{
         score: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strip>>;
     creditsEstimate: z.ZodNumber;
+    requiresResidential: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     maxEngineCalls: z.ZodOptional<z.ZodNumber>;
     inputSchema: z.ZodObject<{
         type: z.ZodLiteral<"object">;

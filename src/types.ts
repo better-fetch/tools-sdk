@@ -70,6 +70,8 @@ export interface ToolManifest {
   popularity?: ToolPopularity;
   /** Typical engine calls per run — display only; metering is per call. */
   creditsEstimate: number;
+  /** The hosted tool has no supported direct-only path; Pro or Scale is required. */
+  requiresResidential?: boolean;
   /** Hard cap on engine calls per run in the hosted runner (default 20, max 50). */
   maxEngineCalls?: number;
   inputSchema: JsonSchemaObject;
